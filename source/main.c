@@ -7,6 +7,7 @@
 #include "SPI.h"
 #include "GPIO.h"
 #include "TIMER.h"
+#include "lcd.h"
 
 uint32_t cntr = 0;
 
@@ -20,6 +21,7 @@ int main(void)
   init_SPI();
   init_GPIO();
   init_TIMER();
+  init_LCD();
   while(1);
   return 0;
 }
@@ -33,5 +35,8 @@ void CTIMER0_IRQHandler(void)
   }
   cntr++;
   GPIO->NOT[0] = (1UL << 9);
-  SPI_Transmit(data, 3);
+
+  // GPIO_set_P0_4(0);
+  // SPI_Transmit(data, 3);
+  // GPIO_set_P0_4(1);
 }

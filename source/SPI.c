@@ -27,8 +27,6 @@ void init_SPI()
   IOCON->PIO[0][2] = IOCON_PIO_FUNC1 | IOCON_PIO_SLEW_FAST | IOCON_PIO_DIGITAL_EN;
   // MOSI
   IOCON->PIO[0][3] = IOCON_PIO_FUNC1 | IOCON_PIO_SLEW_FAST | IOCON_PIO_DIGITAL_EN;
-  // SS0
-  IOCON->PIO[0][4] = IOCON_PIO_FUNC8 | IOCON_PIO_SLEW_STANDARD | IOCON_PIO_DIGITAL_EN;
   // SS1
   IOCON->PIO[0][5] = IOCON_PIO_FUNC8 | IOCON_PIO_SLEW_STANDARD | IOCON_PIO_DIGITAL_EN;
   // CLK
@@ -43,23 +41,16 @@ void init_SPI()
 
 void SPI_Transmit(unsigned char* data, int size)
 {
-  // Empty the buffers
-  SPI3->FIFOCFG |= SPI_FIFOCFG_EMPTYTX_MASK | SPI_FIFOCFG_EMPTYRX_MASK;
-  // Reset possible errors
-  SPI3->FIFOSTAT = SPI_FIFOSTAT_TXERR_MASK | SPI_FIFOSTAT_RXERR_MASK;
-
   while (size > 0) {
 
     // wait till transmit FIFO is not empty
     while ((SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK) == 0);
 
-    uint32_t ctrl = SPI_FIFOWR_LEN(7)        // 8 Bit
-                  | SPI_FIFOWR_TXSSEL0_N(0)  // SS0 YES
-                  | SPI_FIFOWR_TXSSEL1_N(1); // SS1 NO
+    uint32_t ctrl = SPI_FIFOWR_LEN(7) | SPI_FIFOWR_RXIGNORE(1);
 
     // last byte?
     if (size == 1) {
-      ctrl |= SPI_FIFOWR_EOT_MASK; // set "End Of Transfer
+      ctrl |= SPI_FIFOWR_EOT(1); // set "End Of Transfer
     }
 
     SPI3->FIFOWR = ctrl | *data;
@@ -69,5 +60,15 @@ void SPI_Transmit(unsigned char* data, int size)
   }
 
   // wait will everything is sent
-  while ((SPI3->FIFOSTAT & SPI_FIFOSTAT_TXEMPTY_MASK) == 0);
+  while ((SPI3->STAT & SPI_STAT_MSTIDLE_MASK) == 0);
+}
+
+void SPI_Send_Byte(uint8_t byte)
+{
+  while ((SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK) == 0);
+  SPI3->FIFOWR = SPI_FIFOWR_LEN(7)
+               | SPI_FIFOWR_EOT(1)
+               | SPI_FIFOWR_RXIGNORE(1)
+               | byte;
+  while ((SPI3->STAT & SPI_STAT_MSTIDLE_MASK) == 0);
 }
