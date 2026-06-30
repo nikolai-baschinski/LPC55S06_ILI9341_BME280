@@ -27,6 +27,8 @@ BME280 data (temperature, air pressure and humidity) displayed on the Waveshare 
 
 BME280 SPI raw data burst
 
+![](/Doc/block_diagram_small.png)
+
 Hardware
 
 BME280: https://seengreat.com/product/207/bme280-environmental-sensor?srsltid=AfmBOorvlymsT9w0Ea-JBnftBbgADYcXMKpadnPHUyHl7X1wOO5TTgUa
