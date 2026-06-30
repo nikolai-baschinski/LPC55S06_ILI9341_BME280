@@ -76,6 +76,7 @@
 #include <stdlib.h>
 #include <string.h> //memset()
 #include <math.h>
+#include <stdio.h>
 
 volatile PAINT Paint;
 void (*DISPLAY)(UWORD,UWORD,UWORD);

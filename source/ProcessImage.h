@@ -3,13 +3,7 @@
 #ifndef PROCESSIMAGE_H_
 #define PROCESSIMAGE_H_
 
-//TODO#include "BME.h"
-struct BME280_for_LCD {
-  float temperature;
-  uint16_t pressure;
-  uint8_t humidity;
-};
-
+#include "bme.h"
 
 struct ProcessImage {
   struct BME280_for_LCD bme280;

@@ -1,20 +1,22 @@
 // (c) Nikolai Baschinski
 
 #include "LPC55S06.h"
+#include "FPU.h"
 #include "PMC.h"
 #include "FLASH.h"
 #include "CLOCK.h"
 #include "SPI.h"
 #include "GPIO.h"
 #include "TIMER.h"
+#include "NVIC.h"
 #include "lcd.h"
+#include "bme.h"
 
-uint32_t cntr = 0;
-
-unsigned char data[3] = {0x02, 0x32, 0xF6};
+struct ProcessImage pi={0};
 
 int main(void)
 {
+  init_FPU();
   init_PCM();
   init_FLASH();
   init_CLOCK();
@@ -22,7 +24,14 @@ int main(void)
   init_GPIO();
   init_TIMER();
   init_LCD();
-  while(1);
+  init_BME();
+  init_NVIC();
+
+  while(1){
+    cyclic_BME(&pi.bme280);
+    cyclic_LCD(&pi);
+    delay(1000);
+  }
   return 0;
 }
 
@@ -30,13 +39,9 @@ void CTIMER0_IRQHandler(void)
 {
   CTIMER0->IR = CTIMER_IR_MR0INT_MASK;
 
-  if(cntr%100 == 0) {
+  if(pi.cntr_10ms%100 == 0) {
     GPIO->NOT[0] = (1UL << 22);
   }
-  cntr++;
+  pi.cntr_10ms++;
   GPIO->NOT[0] = (1UL << 9);
-
-  // GPIO_set_P0_4(0);
-  // SPI_Transmit(data, 3);
-  // GPIO_set_P0_4(1);
 }

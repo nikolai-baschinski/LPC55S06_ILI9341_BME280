@@ -35,8 +35,6 @@ void init_CTIMER0(void)
   CTIMER0->PC = 0; // set prescale counter to 0
   CTIMER0->IR = CTIMER_IR_MR0INT_MASK;
 
-  NVIC->ISER[0] = (1UL << (uint32_t)CTIMER0_IRQn); // Enable CTIMER0 interrupt
-
   CTIMER0->TCR = 1; // enable timer 0
 }
 
