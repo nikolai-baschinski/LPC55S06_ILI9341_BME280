@@ -1,15 +1,34 @@
 BME280 data (temperature, air pressure and humidity) displayed on the Waveshare ILI9341 LCD by NXP LPC55S06-EVK, bare metal (no SDK functions), using the MCUXpresso IDE.
 
-| SPI       | Port   | Connector |
-|-----------|--------|-----------|
-| GND       | GND    | J10.17    |
-| MISO      | P0_2   | J12.2     |
-| MOSI      | P0_3   | J12.1     |
-| SS0 (LED) | P0_4   | J10.14    |
-| SS1 (BME) | P0_5   | J9.7      |
-| CLK       | P0_6   | J10.16    |
+![](/Doc/Setup.jpg)
+
+| LCD      | Connector | Function     |
+|----------|---------- |------------- |
+| VCC      | J10.11    | Vcc (3.3V)   |
+| GND      | J10.17    | GND          |
+| DIN      | J12.1     | SPI3_MOSI    |
+| CLK      | J10.16    | SPI3_CLK     |
+| CS       | J10.14    | Chip Select  |
+| DC       | J10.4     | Data/Command |
+| RST      | J10.5     | Reset        |
+| BL       | -         | Backlight    |
+
+
+| BME280   | Connector | Function     |
+|----------|-----------|--------------|
+| VCC      | J10.11    | Vcc (3.3V)   |
+| GND      | J10.17    | GND          |
+| SCK      | J10.16    | SPI3_CLK     |
+| MOSI     | J12.1     | SPI3_MOSI    |
+| MISO     | J12.2     | SPI3_MISO    |
+| CS       | J9.7      | Chip Select  |
+
+![](/Doc/SPI_burst.bmp)
+
+BME280 SPI raw data burst
 
 Hardware
+
 BME280: https://seengreat.com/product/207/bme280-environmental-sensor?srsltid=AfmBOorvlymsT9w0Ea-JBnftBbgADYcXMKpadnPHUyHl7X1wOO5TTgUa
 
 LCD: https://www.waveshare.com/wiki/2.4inch_LCD_Module?srsltid=AfmBOoqtv3bq-mZfPtsi2BxiewwQnIkomXrloIzpVwGw_HnrOcmvQZar
