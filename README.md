@@ -2,26 +2,26 @@ BME280 data (temperature, air pressure and humidity) displayed on the Waveshare 
 
 ![](/Doc/Setup.jpg)
 
-| LCD      | Connector | Function     |
-|----------|---------- |------------- |
-| VCC      | J10.11    | Vcc (3.3V)   |
-| GND      | J10.17    | GND          |
-| DIN      | J12.1     | SPI3_MOSI    |
-| CLK      | J10.16    | SPI3_CLK     |
-| CS       | J10.14    | Chip Select  |
-| DC       | J10.4     | Data/Command |
-| RST      | J10.5     | Reset        |
-| BL       | -         | Backlight    |
+| LCD      | Connector | Function     | Port | Peripheral |
+|----------|---------- |------------- |------|------------|
+| VCC      | J10.11    | Vcc (3.3V)   |      |            |
+| GND      | J10.17    | GND          |      |            |
+| DIN      | J12.1     | SPI3_MOSI    | P0_3 | SPI3       |
+| CLK      | J10.16    | SPI3_CLK     | P0_6 | SPI3       |
+| CS       | J10.14    | Chip Select  | P0_4 | GPIO       |
+| DC       | J10.4     | Data/Command | P0_7 | GPIO       |
+| RST      | J10.5     | Reset        | P0_8 | GPIO       |
+| BL       | -         | Backlight    |      |            |
 
 
-| BME280   | Connector | Function     |
-|----------|-----------|--------------|
-| VCC      | J10.11    | Vcc (3.3V)   |
-| GND      | J10.17    | GND          |
-| SCK      | J10.16    | SPI3_CLK     |
-| MOSI     | J12.1     | SPI3_MOSI    |
-| MISO     | J12.2     | SPI3_MISO    |
-| CS       | J9.7      | Chip Select  |
+| BME280   | Connector | Function     | Port | Peripheral |
+|----------|-----------|--------------|------|------------|
+| VCC      | J10.11    | Vcc (3.3V)   |      |            |
+| GND      | J10.17    | GND          |      |            |
+| SCK      | J10.16    | SPI3_CLK     | P0_6 | SPI3       |
+| MOSI     | J12.1     | SPI3_MOSI    | P0_3 | SPI3       |
+| MISO     | J12.2     | SPI3_MISO    | P0_2 | SPI3       |
+| CS       | J9.7      | Chip Select  | P0_5 | GPIO       |
 
 ![](/Doc/SPI_burst.bmp)
 
