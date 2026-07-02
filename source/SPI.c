@@ -1,6 +1,5 @@
 #include "LPC55S06.h"
 #include "SPI.h"
-#include "string.h"
 
 #define IOCON_PIO_DIGITAL_EN 0x0100u  /*!<@brief Enables digital function */
 #define IOCON_PIO_FUNC1 0x01u         /*!<@brief Selects pin function 1 */
@@ -35,13 +34,13 @@ void init_SPI()
   IOCON->PIO[0][6] = IOCON_PIO_FUNC1 | IOCON_PIO_SLEW_FAST | IOCON_PIO_DIGITAL_EN;
 
   SPI3->FIFOCFG |= SPI_FIFOCFG_ENABLETX(0) | SPI_FIFOCFG_ENABLERX(0); // Disable FIFO TX/RX
-  SPI3->DIV = 11; // SPI prescalor
+  SPI3->DIV = 2; // SPI prescalor
   SPI3->FIFOCFG |= SPI_FIFOCFG_EMPTYTX_MASK | SPI_FIFOCFG_EMPTYRX_MASK; // Empty the buffers
   SPI3->FIFOCFG |= SPI_FIFOCFG_ENABLETX(1) | SPI_FIFOCFG_ENABLERX(1); // Enable FIFO TX/RX
   SPI3->CFG = SPI_CFG_MASTER(1) | SPI_CFG_ENABLE(1);
 }
 
-void SPI_Transmit(unsigned char* data, int size)
+void SPI_transmit(unsigned char* data, int size)
 {
   while (size > 0) {
 
@@ -65,7 +64,7 @@ void SPI_Transmit(unsigned char* data, int size)
   while ((SPI3->STAT & SPI_STAT_MSTIDLE_MASK) == 0);
 }
 
-void SPI_Send_Byte(uint8_t byte)
+void SPI_send_byte(uint8_t byte)
 {
   while ((SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK) == 0);
   SPI3->FIFOWR = SPI_FIFOWR_LEN(7)
@@ -75,7 +74,7 @@ void SPI_Send_Byte(uint8_t byte)
   while ((SPI3->STAT & SPI_STAT_MSTIDLE_MASK) == 0);
 }
 
-uint8_t SPI_Send_Byte_Receive_Byte(uint8_t byte)
+uint8_t SPI_send_byte_receive_byte(uint8_t byte)
 {
   uint32_t rx;
 
@@ -99,23 +98,17 @@ uint8_t SPI_Send_Byte_Receive_Byte(uint8_t byte)
   return (uint8_t)rx;
 }
 
-uint8_t* SPI_Tranceive_Burst(uint8_t data)
+uint8_t* SPI_tranceive_burst(uint8_t data)
 {
-  memset(burst_rcv_buffer, 0, MAX_RECV_BURST);
   for(int i = 0; i < MAX_RECV_BURST; i++) {
 
     // Wait until TX FIFO has space
     while (!(SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK));
 
-    // Send one byte
     if(i == 0) {
-      SPI3->FIFOWR = SPI_FIFOWR_LEN(7) | data;
+      SPI3->FIFOWR = SPI_FIFOWR_LEN(7) | SPI_FIFOWR_EOT(1) | data;
     } else {
-      if (i == MAX_RECV_BURST-1){
-        SPI3->FIFOWR = SPI_FIFOWR_LEN(7) | SPI_FIFOWR_EOT(1) | 0xFF;
-      } else {
-        SPI3->FIFOWR = SPI_FIFOWR_LEN(7) | 0xFF;
-      }
+      SPI3->FIFOWR = SPI_FIFOWR_LEN(7) | SPI_FIFOWR_EOT(1) | 0xFF;
     }
 
     // Wait until one byte has been received
@@ -124,8 +117,6 @@ uint8_t* SPI_Tranceive_Burst(uint8_t data)
     // Store received byte
     burst_rcv_buffer[i] = (uint8_t)SPI3->FIFORD;
   }
-  // Wait until SPI transfer has completed
-  while (!(SPI3->STAT & SPI_STAT_MSTIDLE_MASK));
 
   return burst_rcv_buffer;
 }

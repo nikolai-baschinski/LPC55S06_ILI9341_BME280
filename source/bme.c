@@ -123,7 +123,7 @@ uint8_t bme_read(uint8_t data)
 {
   uint8_t rv = 0;
   bme_CS_enable();
-  rv = SPI_Send_Byte_Receive_Byte(data);
+  rv = SPI_send_byte_receive_byte(data);
   bme_CS_disable();
   return rv;
 }
@@ -283,7 +283,7 @@ void bme_compensate()
 void bme_get_raw_sensor_data()
 {
   bme_CS_enable();
-  uint8_t* burst_rcv_buffer = SPI_Tranceive_Burst(0xF7);
+  uint8_t* burst_rcv_buffer = SPI_tranceive_burst(0xF7);
   bme_CS_disable();
 
   bme.Adc_P.P_msb  = burst_rcv_buffer[1];
@@ -310,10 +310,10 @@ void init_BME()
 
   bme_CS_enable();
 
-  SPI_Send_Byte(ctrl_hum_addr & 0x7F); // Write control byte address F2 write (0x72)
-  SPI_Send_Byte(0x01); // Data byte oversampling is 1
-  SPI_Send_Byte(ctrl_meas_addr & 0x7F); // Write control byte address F4 write (0x74)
-  SPI_Send_Byte(0x27); // Data byte 0b0010.0111 oversampling is 1, mode is normal*/
+  SPI_send_byte(ctrl_hum_addr & 0x7F); // Write control byte address F2 write (0x72)
+  SPI_send_byte(0x01); // Data byte oversampling is 1
+  SPI_send_byte(ctrl_meas_addr & 0x7F); // Write control byte address F4 write (0x74)
+  SPI_send_byte(0x27); // Data byte 0b0010.0111 oversampling is 1, mode is normal*/
 
   bme_CS_disable();
 }

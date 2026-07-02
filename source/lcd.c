@@ -35,7 +35,7 @@ void lcd_DC_set_command()
 
 void spi_send(uint8_t byte)
 {
-  SPI_Send_Byte(byte);
+  SPI_send_byte(byte);
 }
 
 void lcd_send_c(uint8_t byte)
