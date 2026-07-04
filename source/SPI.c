@@ -12,8 +12,9 @@
 #define IOCON_PIO_SLEW_FAST 0x40u
 #define IOCON_PIO_OPEN_DRAIN_ENABLED 0x200u
 
-#define MAX_RECV_BURST 9
-uint8_t burst_rcv_buffer[MAX_RECV_BURST]= {0};
+uint8_t burst_rcv_buffer[BME280_BURST_BUFFER_SIZE]= {0};
+
+#define SPI_FIFO_DEPTH 8U // LPC55S06 FLEXCOMM SPI, see SPI3->FIFOSIZE / UM11424
 
 void init_SPI()
 {
@@ -100,7 +101,7 @@ uint8_t SPI_send_byte_receive_byte(uint8_t byte)
 
 uint8_t* SPI_tranceive_burst(uint8_t data)
 {
-  for(int i = 0; i < MAX_RECV_BURST; i++) {
+  for(int i = 0; i < BME280_BURST_BUFFER_SIZE; i++) {
 
     // Wait until TX FIFO has space
     while (!(SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK));
@@ -119,4 +120,46 @@ uint8_t* SPI_tranceive_burst(uint8_t data)
   }
 
   return burst_rcv_buffer;
+}
+
+void SPI_BME280_burst(uint8_t* rx_buffer)
+{
+  uint32_t rxRemainingBytes = BME280_BURST_BUFFER_SIZE;
+  uint32_t txRemainingBytes = BME280_BURST_BUFFER_SIZE;
+  uint32_t toReceiveCount = 0;
+  uint32_t tmp32;
+
+  // clear tx/rx errors and empty FIFOs (like the SDK does on entry)
+  SPI3->FIFOCFG |= SPI_FIFOCFG_EMPTYTX_MASK | SPI_FIFOCFG_EMPTYRX_MASK;
+  SPI3->FIFOSTAT |= SPI_FIFOSTAT_TXERR_MASK | SPI_FIFOSTAT_RXERR_MASK;
+
+  while ((txRemainingBytes != 0U) || (rxRemainingBytes != 0U)) {
+
+    // if rxFIFO is not empty
+    if ((SPI3->FIFOSTAT & SPI_FIFOSTAT_RXNOTEMPTY_MASK) != 0U) {
+      tmp32 = SPI3->FIFORD;
+
+      if (rxRemainingBytes != 0U) {
+        *(rx_buffer++) = (uint8_t)tmp32;
+        rxRemainingBytes--;
+      }
+      toReceiveCount -= 1U;
+    }
+
+    // transmit if txFIFO is not full and data to receive does not exceed FIFO depth
+    if ( ((SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK) != 0U) && (toReceiveCount < SPI_FIFO_DEPTH) && (txRemainingBytes != 0U) ) {
+      if (txRemainingBytes == 9) {
+        tmp32 = 0xF7U; // burst start: read press_msb (bit 7 = read)
+      } else {
+        tmp32 = 0xFFU;
+      }
+      tmp32 |= SPI_FIFOWR_LEN(7); // 8-bit frame - required in EVERY word
+      txRemainingBytes--;
+      if (txRemainingBytes == 0U) {
+        tmp32 |= SPI_FIFOWR_EOT(1);
+      }
+      SPI3->FIFOWR = tmp32;
+      toReceiveCount += 1U;
+    }
+  }
 }

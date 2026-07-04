@@ -282,8 +282,10 @@ void bme_compensate()
 
 void bme_get_raw_sensor_data()
 {
+  uint8_t burst_rcv_buffer[BME280_BURST_BUFFER_SIZE];
+
   bme_CS_enable();
-  uint8_t* burst_rcv_buffer = SPI_tranceive_burst(0xF7);
+  SPI_BME280_burst(burst_rcv_buffer);
   bme_CS_disable();
 
   bme.Adc_P.P_msb  = burst_rcv_buffer[1];
