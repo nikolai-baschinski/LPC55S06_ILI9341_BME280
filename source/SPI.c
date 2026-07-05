@@ -129,27 +129,28 @@ void SPI_BME280_burst(uint8_t* rx_buffer)
   uint32_t toReceiveCount = 0;
   uint32_t tmp32;
 
-  // clear tx/rx errors and empty FIFOs (like the SDK does on entry)
-  SPI3->FIFOCFG |= SPI_FIFOCFG_EMPTYTX_MASK | SPI_FIFOCFG_EMPTYRX_MASK;
+  // clear tx/rx errors and empty FIFOs
+  SPI3->FIFOCFG  |= SPI_FIFOCFG_EMPTYTX_MASK | SPI_FIFOCFG_EMPTYRX_MASK;
   SPI3->FIFOSTAT |= SPI_FIFOSTAT_TXERR_MASK | SPI_FIFOSTAT_RXERR_MASK;
 
   while ((txRemainingBytes != 0U) || (rxRemainingBytes != 0U)) {
 
-    // if rxFIFO is not empty
-    if ((SPI3->FIFOSTAT & SPI_FIFOSTAT_RXNOTEMPTY_MASK) != 0U) {
-      tmp32 = SPI3->FIFORD;
+    // receive
+    if ( ((SPI3->FIFOSTAT & SPI_FIFOSTAT_RXNOTEMPTY_MASK) != 0U) &&  // if rxFIFO is not empty
+         (rxRemainingBytes != 0U) ) {                                // not all the bytes have been received yet
 
-      if (rxRemainingBytes != 0U) {
-        *(rx_buffer++) = (uint8_t)tmp32;
-        rxRemainingBytes--;
-      }
+      *(rx_buffer++) = (uint8_t)SPI3->FIFORD;
+      rxRemainingBytes--;
       toReceiveCount -= 1U;
     }
 
-    // transmit if txFIFO is not full and data to receive does not exceed FIFO depth
-    if ( ((SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK) != 0U) && (toReceiveCount < SPI_FIFO_DEPTH) && (txRemainingBytes != 0U) ) {
-      if (txRemainingBytes == 9) {
-        tmp32 = 0xF7U; // burst start: read press_msb (bit 7 = read)
+    // transmit
+    if ( ((SPI3->FIFOSTAT & SPI_FIFOSTAT_TXNOTFULL_MASK) != 0U) && // txFIFO is not full
+         (toReceiveCount < SPI_FIFO_DEPTH) &&                      // data to receive does not exceed FIFO depth
+         (txRemainingBytes != 0U) ) {                              // not all the bytes have been sent yet
+
+      if (txRemainingBytes == BME280_BURST_BUFFER_SIZE) {
+        tmp32 = 0xF7U; // burst start
       } else {
         tmp32 = 0xFFU;
       }
