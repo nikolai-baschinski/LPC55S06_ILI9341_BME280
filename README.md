@@ -20,8 +20,8 @@ BME280 sensor data (temperature, air pressure, and humidity) displayed on a Wave
 | GND      | J10.17    | GND          |       |            |
 | SCL      | J13.12    | Clock        | P0_14 | I2C        |
 | SDA      | J13.10    | Data         | P0_13 | I2C        |
-| ADDR     | J12.2     |              |       |            |
-| CS       | J10.11    | -            |       |            |
+| ADDR     | J12.2     | Vcc (3.3V)   |       |            |
+| CS       | J10.11    | Vcc (3.3V)   |       |            |
 
 
 ![](/Doc/I2C_burst.bmp)
