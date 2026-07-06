@@ -1,7 +1,7 @@
 #include <string.h>
 #include "bme.h"
 #include "TIMER.h"
-#include "SPI.h"
+#include "I2C.h"
 #include "GPIO.h"
 
 const uint8_t ctrl_meas_addr = 0xF4;
@@ -109,22 +109,10 @@ void bme_get_sensor_data(struct BME280_for_LCD* p_bme_data)
   }
 }
 
-void bme_CS_enable()
-{
-  GPIO_set_P0_5(0);
-}
-
-void bme_CS_disable()
-{
-  GPIO_set_P0_5(1);
-}
-
 uint8_t bme_read(uint8_t data)
 {
   uint8_t rv = 0;
-  bme_CS_enable();
-  rv = SPI_send_byte_receive_byte(data);
-  bme_CS_disable();
+  rv = I2C_write_read(data);
   return rv;
 }
 
@@ -282,20 +270,18 @@ void bme_compensate()
 
 void bme_get_raw_sensor_data()
 {
-  uint8_t burst_rcv_buffer[BME280_BURST_BUFFER_SIZE];
+  uint8_t burst_rcv_buffer[MAX_RECV_BURST];
 
-  bme_CS_enable();
-  SPI_BME280_burst(burst_rcv_buffer);
-  bme_CS_disable();
+  I2C_read_burst(burst_rcv_buffer, MAX_RECV_BURST);
 
-  bme.Adc_P.P_msb  = burst_rcv_buffer[1];
-  bme.Adc_P.P_lsb  = burst_rcv_buffer[2];
-  bme.Adc_P.P_xlsb = burst_rcv_buffer[3];
-  bme.Adc_T.T_msb  = burst_rcv_buffer[4];
-  bme.Adc_T.T_lsb  = burst_rcv_buffer[5];
-  bme.Adc_T.T_xlsb = burst_rcv_buffer[6];
-  bme.Adc_H.H_msb  = burst_rcv_buffer[7];
-  bme.Adc_H.H_lsb  = burst_rcv_buffer[8];
+  bme.Adc_P.P_msb  = burst_rcv_buffer[0];
+  bme.Adc_P.P_lsb  = burst_rcv_buffer[1];
+  bme.Adc_P.P_xlsb = burst_rcv_buffer[2];
+  bme.Adc_T.T_msb  = burst_rcv_buffer[3];
+  bme.Adc_T.T_lsb  = burst_rcv_buffer[4];
+  bme.Adc_T.T_xlsb = burst_rcv_buffer[5];
+  bme.Adc_H.H_msb  = burst_rcv_buffer[6];
+  bme.Adc_H.H_lsb  = burst_rcv_buffer[7];
 }
 
 void cyclic_BME(struct BME280_for_LCD* p_bme_data)
@@ -310,12 +296,10 @@ void init_BME()
   memset(&bme, 0, sizeof(bme));
   bme_fetch_compensation_data(&bme);
 
-  bme_CS_enable();
+  #define LENGTH_BME_CONF 2
+  uint8_t control_bytes_F2[LENGTH_BME_CONF] = {0xF2, 0x01};
+  uint8_t control_bytes_F4[LENGTH_BME_CONF] = {0xF4, 0x27};
 
-  SPI_send_byte(ctrl_hum_addr & 0x7F); // Write control byte address F2 write (0x72)
-  SPI_send_byte(0x01); // Data byte oversampling is 1
-  SPI_send_byte(ctrl_meas_addr & 0x7F); // Write control byte address F4 write (0x74)
-  SPI_send_byte(0x27); // Data byte 0b0010.0111 oversampling is 1, mode is normal*/
-
-  bme_CS_disable();
+  I2C_write(control_bytes_F2, LENGTH_BME_CONF);
+  I2C_write(control_bytes_F4, LENGTH_BME_CONF);
 }

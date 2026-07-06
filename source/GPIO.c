@@ -19,11 +19,6 @@ void init_GPIO()
   GPIO->DIRSET[0] = (1UL << 4);
   GPIO->SET[0] = (1UL << 4);
 
-  // GPIO Port 0 , Pin 5 (CS - Chip Select for BME280)
-  IOCON->PIO[0][5] = IOCON_PIO_DIGIMODE(1);
-  GPIO->DIRSET[0] = (1UL << 5);
-  GPIO->SET[0] = (1UL << 5);
-
   // GPIO Port 0, Pin 7 (DC data/command for LCD)
   IOCON->PIO[0][7] = IOCON_PIO_DIGIMODE(1);
   GPIO->DIRSET[0] = (1UL << 7);

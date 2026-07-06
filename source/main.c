@@ -6,6 +6,7 @@
 #include "FLASH.h"
 #include "CLOCK.h"
 #include "SPI.h"
+#include "I2C.h"
 #include "GPIO.h"
 #include "TIMER.h"
 #include "NVIC.h"
@@ -21,6 +22,7 @@ int main(void)
   init_FLASH();
   init_CLOCK();
   init_SPI();
+  init_I2C();
   init_GPIO();
   init_TIMER();
   init_LCD();

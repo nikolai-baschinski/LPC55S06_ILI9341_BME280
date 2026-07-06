@@ -14,20 +14,19 @@ BME280 data (temperature, air pressure and humidity) displayed on the Waveshare 
 | BL       | -         | Backlight    |      |            |
 
 
-| BME280   | Connector | Function     | Port | Peripheral |
-|----------|-----------|--------------|------|------------|
-| VCC      | J10.11    | Vcc (3.3V)   |      |            |
-| GND      | J10.17    | GND          |      |            |
-| SCK      | J10.16    | SPI3_CLK     | P0_6 | SPI3       |
-| MOSI     | J12.1     | SPI3_MOSI    | P0_3 | SPI3       |
-| MISO     | J12.2     | SPI3_MISO    | P0_2 | SPI3       |
-| CS       | J9.7      | Chip Select  | P0_5 | GPIO       |
+| BME280   | Connector | Function     | Port  | Peripheral |
+|----------|-----------|--------------|-------|------------|
+| VCC      | J10.11    | Vcc (3.3V)   |       |            |
+| GND      | J10.17    | GND          |       |            |
+| SCL      | J13.12    | Clock        | P0_14 | I2C        |
+| SDA      | J13.10    | Data         | P0_13 | I2C        |
+| ADDR     | J12.2     |              |       |            |
+| CS       | J10.11    | -            |       |            |
 
-![](/Doc/SPI_burst.bmp)
 
-BME280 SPI raw data burst
+![](/Doc/I2C_burst.bmp)
 
-![](/Doc/block_diagram_small.png)
+BME280 I2C raw data burst
 
 Hardware
 
