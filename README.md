@@ -1,4 +1,4 @@
-BME280 data (temperature, air pressure and humidity) displayed on the Waveshare ILI9341 LCD by NXP LPC55S06-EVK, bare metal (no SDK functions), using the MCUXpresso IDE. SPI and I2C drivers on separate branch.
+BME280 sensor data (temperature, air pressure, and humidity) displayed on a Waveshare ILI9341 LCD using the NXP LPC55S06-EVK. Bare-metal implementation (no SDK functions), developed with the MCUXpresso IDE. SPI and I²C drivers are available on a separate branch.
 
 ![](/Doc/Setup.jpg)
 
