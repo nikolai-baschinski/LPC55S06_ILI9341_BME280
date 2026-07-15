@@ -25,8 +25,8 @@ int main(void)
   init_I2C();
   init_GPIO();
   init_TIMER();
-  init_LCD();
   init_BME();
+  init_LCD();
   init_NVIC();
 
   while(1){
